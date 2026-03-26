@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pdfkit
 import io
+import os
 
 st.set_page_config(page_title="Mini-ETL Dashboard", layout="wide")
 
@@ -15,7 +16,6 @@ try:
 except Exception as e:
     st.error("Erreur lors du chargement des fichiers. Lance d'abord le pipeline ETL !")
     st.stop()
-
 
 # ---- Sidebar - Filtres ----
 st.sidebar.title("🔎 Filtres")
@@ -36,12 +36,11 @@ categories = st.sidebar.multiselect(
 
 if len(categories) == 0:
     st.warning("⚠️ Veuillez sélectionner au moins une catégorie.")
-    st.stop()  # Le script s'arrête ici, plus aucun affichage, évite le message d'erreur code
+    st.stop()
 else:
     df_filtré = df_filtré[df_filtré["category"].isin(categories)]
 
 # --- Bloc sécurisé pour min/max prix (gestion NaN si filtre vide) ---
-
 if not df_filtré.empty and df_filtré["price_usd"].dropna().size > 0:
     min_price_val = df_filtré["price_usd"].min()
     max_price_val = df_filtré["price_usd"].max()
@@ -54,10 +53,9 @@ else:
 seuil = st.sidebar.slider(
     "💵 Seuil prix ($, filtre produits chers)", 
     min_value=min_price,
-    max_value=max_price if max_price > min_price else min_price + 1,  # Min. range = 1$ si vide/une seule valeur
+    max_value=max_price if max_price > min_price else min_price + 1,
     value=min(500, max_price if max_price > min_price else min_price + 1)
 )
-
 df_cher = df_filtré[df_filtré["price_usd"] > seuil]
 
 # Téléchargement du tableau filtré général (recherche/catégorie uniquement)
@@ -69,7 +67,7 @@ st.sidebar.download_button(
     mime="text/csv"
 )
 
-# Téléchargement du tableau "produits chers" (recherche/catégorie + seuil)
+# Téléchargement du tableau "produits chers"
 csv_chers = df_cher.to_csv(index=False).encode()
 st.sidebar.download_button(
     label="⬇️ Télécharger produits chers (CSV)",
@@ -78,7 +76,7 @@ st.sidebar.download_button(
     mime="text/csv"
 )
 
-# --- Bouton d'export Excel (toujours sans souci) ---
+# --- Bouton d'export Excel ---
 excel_bytes = io.BytesIO()
 df_filtré.to_excel(excel_bytes, index=False, engine='openpyxl')
 excel_bytes.seek(0)
@@ -90,15 +88,6 @@ st.sidebar.download_button(
 )
 
 # --- Bouton d'export PDF ---
-
-# Chemin de wkhtmltopdf.exe à adapter chez toi si besoin !
-pdfkit_config = pdfkit.configuration(
-    wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-)
-
-import os
-
-# ------------ PDF EXPORT -----------
 html_rapport = f"""
 <h1 style='color:#1f77b4;'>Rapport Produits Filtres</h1>
 <h2>Resume</h2>
@@ -112,11 +101,9 @@ html_rapport = f"""
 """
 
 try:
-    # Chemin vers wkhtmltopdf EXE (ne marche que sur TON ORDI, jamais sur le cloud)
     pdfkit_config = None
-    if os.name == "nt":  # Windows local
+    if os.name == "nt":  # Seulement sur Windows local avec wkhtmltopdf installé
         pdfkit_config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
-
     pdf_bytes = pdfkit.from_string(html_rapport, False, configuration=pdfkit_config)
     st.sidebar.download_button(
         label="⬇️ Télécharger le rapport filtré (PDF)",
@@ -125,11 +112,11 @@ try:
         mime="application/pdf"
     )
 except Exception as e:
-    st.sidebar.warning("⚠️ Export PDF impossible sur la version en ligne (wkhtmltopdf non disponible). En local sur ton PC, ce bouton fonctionne si wkhtmltopdf est installé. Export Excel/CSV : OK.")
+    st.sidebar.warning("⚠️ Export PDF impossible ici (wkhtmltopdf non disponible). Export Excel/CSV : OK.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Réalisé par : Nabila ARAB**")
-# st.sidebar.image("logo.png", width=100) # Ajoute un logo si besoin
+# st.sidebar.image("logo.png", width=100)
 
 # ---- Indicateurs clés (KPI) ----
 st.title("📊 Dashboard Mini-ETL Produits")
@@ -195,7 +182,7 @@ cat_dom = prix_par_categorie.sort_values("price_usd", ascending=False).iloc[0]["
 if part_max > 60:
     st.error(f"🚨 Attention : La catégorie '{cat_dom}' représente {part_max:.1f}% du CA total !")
 else:
-    st.info(f"La répartition du CA par catégorie est équilibrée (catégorie max : {cat_dom} = {part_max:.1f}%).")
+    st.info(f"La répartition du CA par catégorie est équilibrée (catégorie max : {cat_dom} = {part_max:.1f}%).")
 
 # ---- Zone d'analyse automatique sympa (bonus) ----
 st.markdown("### 🤖 Analyse automatique :")
@@ -214,6 +201,7 @@ else:
 nb_outliers = df[df["price_usd"] > df["price_usd"].quantile(0.95)].shape[0]
 if nb_outliers > 0:
     st.info(f"💡 {nb_outliers} produit(s) ont un prix exceptionnellement élevé (top 5% du dataset).")
+
 # ---- Footer ----
 st.markdown("---")
 st.markdown(
