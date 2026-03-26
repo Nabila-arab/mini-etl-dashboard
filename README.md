@@ -1,102 +1,123 @@
-# Mini-ETL Automatisé - Analyse de Données Produits
+# 🛠️ Mini-ETL Produits : Pipeline de Traitement Automatisé et Dashboard Interactif
 
-## Présentation générale
-Ce projet est un pipeline automatisé pour l’analyse de jeux de données produits (CSV), composé de :
-- Un script ETL Python pour nettoyage/agrégation/exports
-- Un notebook de visualisation pour l’analyse graphique
-- Une API Flask pour exposer les résultats
+**Auteur : Nabila ARAB – Master 1 Informatique Big Data – Paris 8**  
+Date : Mars 2026
 
 ---
 
-## 1. Fonctionnement global
+## 🚀 Présentation du projet
 
-1. **Dataset brut**  
-   - Ex : `data/products.csv` (données produits Kaggle)
-2. **Pipeline ETL (`etl/run.py`)**
-   - Nettoie les données (doublons, valeurs manquantes, etc.)
-   - Agrège prix par produit et par catégorie
-   - Calcule les indicateurs clés (prix total, marge totale, nb de produits)
-   - Génère les exports dans le dossier `exports/`
-3. **Visualisation**
-   - Le notebook Jupyter utilise les exports pour produire des graphes interactifs et lister des KPIs
-4. **API Flask**
-   - Sert dynamiquement les fichiers exportés et résultats sur une interface web (`http://127.0.0.1:5000`)
+Ce projet propose un pipeline ETL automatisé pour le traitement de fichiers produits, ainsi qu’un dashboard **interactif** pour explorer, analyser et exporter ces données facilement, sans compétences techniques requises.
+
+### **Objectifs :**
+- Automatiser la préparation, le nettoyage, l’agrégation et l’analyse de données produits.
+- Fournir une interface **Streamlit** simple d’utilisation pour le filtrage, la visualisation et l’export des résultats.
+- Faciliter la prise de décision métier sur les données produits (ex : identification best-sellers, zones de risque...)
 
 ---
 
-## 2. Structure des dossiers
+## 🏗️ Structure du projet
 
-```
-Mini_etl/
-│
-├── data/
-│     └── products.csv              # Jeux de données source (Kaggle)
-│
-├── etl/
-│     └── run.py                    # ETL principal
-│
-├── exports/                        # Exports générés automatiquement
-│     └── clean_data.csv
-│     └── prix_par_produit.csv
-│     └── prix_par_categorie.csv
-│     └── indicateurs.csv
-│
-├── api/
-│     └── app.py                    # API Flask (option)
-│
-├── visualisation.ipynb             # Notebook principal pour analyse & graphes
-└── README.md
-```
+| Dossier/Fichier           | Rôle                                                                |
+|---------------------------|---------------------------------------------------------------------|
+| `etl/`                    | Scripts de traitement ETL (run.py)                                  |
+| `data/`                   | Donn��es brutes à traiter (ex: products.csv)                         |
+| `exports/`                | Résultats produits par le pipeline ETL (clean_data.csv, prix, kpis…) |
+| `dashboard.py`            | Script principal du dashboard Streamlit                             |
+| `requirements.txt`        | Dépendances Python à installer                                      |
+| `README.md`               | Documentation du projet…                                            |
 
 ---
 
-## 3. Exécution - Mode d’emploi
+## 🛠️ Technologies et librairies utilisées
 
-### ● **1. Lancer le pipeline**  
-```bash
-python etl/run.py
-```
-
-### ● **2. Visualiser les résultats**
-Ouvrir `visualisation.ipynb` et exécuter toutes les cellules :
-- Affichage KPIs
-- Tableau nettoyé
-- Graphiques Top produits, catégories, produits chers
-
-### ● **3. Lancer l’API Flask**
-```bash
-python api/app.py
-```
-Consulter sur : [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+- **Python 3.8+**
+- **Pandas**, **DuckDB** : traitement de données
+- **Streamlit** : dashboard interactif (web)
+- **Matplotlib** : graphiques et visualisations
+- **Pdfkit**/**wkhtmltopdf** : génération d’exports PDF
+- **Jupyter Notebook** : exploration initiale & validation
 
 ---
 
-## 4. Adaptabilité & réutilisation
+## ⚡️ Installation et démarrage
 
-- Il suffit de remplacer le fichier `data/products.csv` par n’importe quel dataset compatible et de relancer le pipeline pour tout recalculer.
-- Changez un paramètre (exemple : seuil du prix “produit cher”) dans l’ETL pour obtenir une nouvelle analyse automatiquement.
+1. **Cloner le projet** :
+    ```bash
+    git clone https://github.com/Nabila-arab/mini-etl-dashboard.git
+    cd mini-etl-dashboard
+    ```
+
+2. **Créer et activer un environnement virtuel** :
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate    # Sur Mac/Linux
+    .venv\Scripts\activate       # Sur Windows
+    ```
+
+3. **Installer les dépendances** :
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Lancer le pipeline ETL** (à adapter selon ton script !):
+    ```bash
+    python etl/run.py
+    ```
+    ➔ Les fichiers propres sont alors générés dans le dossier `exports/`.
+
+5. **Lancer le dashboard** :
+    ```bash
+    streamlit run dashboard.py
+    ```
+    ➔ L’interface s’ouvre dans votre navigateur.
 
 ---
 
-## 5. KPIs/Exports (Exemple)
+## 🖥️ Fonctionnalités du dashboard
 
-| kpi          | valeur   |
-|--------------|----------|
-| prix_total   | 143562   |
-| nb_produits  | 1197     |
-| marge_totale | 50643    |
-
----
-
-## 6. Graphiques Principaux (screens à insérer)
-- **Top 10 produits par chiffre d’affaires**
-- **Répartition prix par catégorie**
-- **Table des produits “chers”**
+- **Recherche et filtrage dynamiques** : par nom, catégorie, intervalle de prix, etc.
+- **Visualisation des indicateurs clés** : prix total, marge, top produits, etc.
+- **Graphiques interactifs** : bar chart, pie chart, etc.
+- **Export des résultats** : CSV, Excel, PDF personnalisés
+- **Alertes et analyses intelligentes** : détection automatiques de cas métier (catégorie dominante, marges faibles, etc.)
+- **Téléchargement rapide de tous les résultats, y compris les rapports PDF/Excel**
 
 ---
 
-## 7. Conclusion
+## 📑 Exemple de workflow type
 
-- Pipeline automatisé, clé-en-main, adapté à tout nouveau jeu de données
-- Visualisations dynamiques faciles à enrichir
-- API prête pour l’intégration avec d’autres applications (frontend, plateforme web, etc.)
+1. **Lancer le pipeline ETL pour traiter les nouveaux fichiers**
+2. **Démarrer le dashboard**
+3. **Appliquer les filtres voulus dans la sidebar**
+4. **Analyser les KPIs, tableaux et graphiques**
+5. **Exporter les résultats en un clic au format souhaité**
+
+---
+
+## 📝 Astuces et conseils d’utilisation
+
+- Si le dashboard affiche une erreur “Fichier non trouvé”, pensez à relancer le pipeline ETL (étape 4).
+- Le bouton “Télécharger PDF” nécessite que `wkhtmltopdf` soit installé sur votre PC.
+- Le projet peut facilement être adapté à d’autres jeux de données (ventes, stocks…), ou déployé sur le cloud (Streamlit Cloud, Heroku, etc.)
+
+---
+
+## 🧑‍💻 Auteur / Contact
+
+- **Nabila ARAB**
+- Email : _[Ajoute ton email étudiant si tu veux]_
+- Université Paris 8 – Master Informatique Big Data
+
+---
+
+## 🏆 Bonus
+
+Scannez le QR code ci-dessous ou cliquez ici pour explorer le code source !  
+[https://github.com/Nabila-arab/mini-etl-dashboard](https://github.com/Nabila-arab/mini-etl-dashboard)
+
+---
+
+## 📜 Licence
+
+Projet académique – Usage non commercial
