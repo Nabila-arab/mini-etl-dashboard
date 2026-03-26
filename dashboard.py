@@ -96,6 +96,9 @@ pdfkit_config = pdfkit.configuration(
     wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
 )
 
+import os
+
+# ------------ PDF EXPORT -----------
 html_rapport = f"""
 <h1 style='color:#1f77b4;'>Rapport Produits Filtres</h1>
 <h2>Resume</h2>
@@ -109,6 +112,11 @@ html_rapport = f"""
 """
 
 try:
+    # Chemin vers wkhtmltopdf EXE (ne marche que sur TON ORDI, jamais sur le cloud)
+    pdfkit_config = None
+    if os.name == "nt":  # Windows local
+        pdfkit_config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+
     pdf_bytes = pdfkit.from_string(html_rapport, False, configuration=pdfkit_config)
     st.sidebar.download_button(
         label="⬇️ Télécharger le rapport filtré (PDF)",
@@ -117,8 +125,7 @@ try:
         mime="application/pdf"
     )
 except Exception as e:
-    st.sidebar.warning("⚠️ Export PDF impossible (pdfkit/wkhtmltopdf non trouvé ?). Export Excel OK !")
-
+    st.sidebar.warning("⚠️ Export PDF impossible sur la version en ligne (wkhtmltopdf non disponible). En local sur ton PC, ce bouton fonctionne si wkhtmltopdf est installé. Export Excel/CSV : OK.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Réalisé par : Nabila ARAB**")
