@@ -1,2 +1,7 @@
 pandas
 duckdb
+streamlit
+matplotlib
+openpyxl
+pdfkit
+matplotlib

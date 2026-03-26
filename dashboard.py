@@ -40,15 +40,24 @@ if len(categories) == 0:
 else:
     df_filtré = df_filtré[df_filtré["category"].isin(categories)]
 
-# Slider prix
-min_price = int(df_filtré["price_usd"].min())
-max_price = int(df_filtré["price_usd"].max())
+# --- Bloc sécurisé pour min/max prix (gestion NaN si filtre vide) ---
+
+if not df_filtré.empty and df_filtré["price_usd"].dropna().size > 0:
+    min_price_val = df_filtré["price_usd"].min()
+    max_price_val = df_filtré["price_usd"].max()
+    min_price = int(min_price_val) if not pd.isna(min_price_val) else 0
+    max_price = int(max_price_val) if not pd.isna(max_price_val) else 1
+else:
+    min_price = 0
+    max_price = 1
+
 seuil = st.sidebar.slider(
     "💵 Seuil prix ($, filtre produits chers)", 
     min_value=min_price,
-    max_value=max_price,
-    value=min(500, max_price)
+    max_value=max_price if max_price > min_price else min_price + 1,  # Min. range = 1$ si vide/une seule valeur
+    value=min(500, max_price if max_price > min_price else min_price + 1)
 )
+
 df_cher = df_filtré[df_filtré["price_usd"] > seuil]
 
 # Téléchargement du tableau filtré général (recherche/catégorie uniquement)
