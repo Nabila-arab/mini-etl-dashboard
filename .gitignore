@@ -1,0 +1,12 @@
+# Ignore the Python virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+.DS_Store
+.ipynb_checkpoints/
+.env
+.env.*
