@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import pdfkit
+#import pdfkit
 import io
 import os
 
@@ -100,19 +100,20 @@ html_rapport = f"""
 {df_filtré.sort_values('price_usd', ascending=False).head(10).to_html(index=False)}
 """
 
-try:
-    pdfkit_config = None
-    if os.name == "nt":  # Seulement sur Windows local avec wkhtmltopdf installé
-        pdfkit_config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
-    pdf_bytes = pdfkit.from_string(html_rapport, False, configuration=pdfkit_config)
-    st.sidebar.download_button(
-        label="⬇️ Télécharger le rapport filtré (PDF)",
-        data=pdf_bytes,
-        file_name="rapport_filtre.pdf",
-        mime="application/pdf"
-    )
-except Exception as e:
-    st.sidebar.warning("⚠️ Export PDF impossible ici (wkhtmltopdf non disponible). Export Excel/CSV : OK.")
+#try:
+#   pdfkit_config = None
+#    if os.name == "nt":  # Seulement sur Windows local avec wkhtmltopdf installé
+#        pdfkit_config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+#    pdf_bytes = pdfkit.from_string(html_rapport, False, configuration=pdfkit_config)
+#    st.sidebar.download_button(
+#        label="⬇️ Télécharger le rapport filtré (PDF)",
+#        data=pdf_bytes,
+#        file_name="rapport_filtre.pdf",
+#        mime="application/pdf"
+#    )
+#except Exception as e:
+#    st.sidebar.warning("⚠️ Export PDF impossible ici (wkhtmltopdf non disponible). Export Excel/CSV : OK.")
+st.sidebar.warning("⚠️ Export PDF désactivé (fonctionnalité non supportée sur cette plateforme). Utilisez l'export Excel ou CSV.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Réalisé par : Nabila ARAB**")
