@@ -1,8 +1,8 @@
 pandas
 duckdb
-streamlit
+streamlit==1.19.0
 matplotlib
 openpyxl
 pdfkit
 matplotlib
-altair
+altair==4.2.2
