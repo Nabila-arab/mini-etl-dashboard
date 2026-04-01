@@ -140,11 +140,8 @@ else:
     st.info("Analytics et graphiques détaillés désactivés sur import CSV utilisateur (démo simplifiée).")
 
 # ---- Tableau stylé des produits filtrés ----
-st.header("📝 Tableau des produits (filtres)")
-st.dataframe(
-    df_filtré.astype(str).style.background_gradient(subset=["margin_usd"], cmap="Greens"),
-    use_container_width=True
-)
+sst.header("📝 Tableau des produits (filtres)")
+st.dataframe(df_filtré.astype(str), use_container_width=True)
 
 # ---- Produits chers (si les colonnes sont présentes) ----
 if "price_usd" in df_filtré.columns and "category" in df_filtré.columns:
@@ -153,7 +150,6 @@ if "price_usd" in df_filtré.columns and "category" in df_filtré.columns:
         st.dataframe(df_cher.astype(str))
     else:
         st.warning("Aucun produit ne correspond à ce filtre dans la sélection courante.")
-
 # ---- Graphiques principaux ----
 if not uploaded_file and not prix_par_produit.empty and not prix_par_categorie.empty:
     st.header("🏆 Produits stars par chiffre d'affaires")
