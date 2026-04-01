@@ -140,7 +140,7 @@ else:
     st.info("Analytics et graphiques détaillés désactivés sur import CSV utilisateur (démo simplifiée).")
 
 # ---- Tableau stylé des produits filtrés ----
-sst.header("📝 Tableau des produits (filtres)")
+st.header("📝 Tableau des produits (filtres)")
 st.dataframe(df_filtré.astype(str), use_container_width=True)
 
 # ---- Produits chers (si les colonnes sont présentes) ----
