@@ -142,7 +142,7 @@ else:
 # ---- Tableau stylé des produits filtrés ----
 st.header("📝 Tableau des produits (filtres)")
 st.dataframe(
-    df_filtré.style.background_gradient(subset=["margin_usd"], cmap="Greens"),
+    df_filtré.astype(str).style.background_gradient(subset=["margin_usd"], cmap="Greens"),
     use_container_width=True
 )
 
@@ -150,7 +150,7 @@ st.dataframe(
 if "price_usd" in df_filtré.columns and "category" in df_filtré.columns:
     st.header(f"🔥 Produits dont le prix > {seuil} $")
     if not df_cher.empty:
-        st.dataframe(df_cher)
+        st.dataframe(df_cher.astype(str))
     else:
         st.warning("Aucun produit ne correspond à ce filtre dans la sélection courante.")
 
