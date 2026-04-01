@@ -7,3 +7,4 @@ pdfkit
 matplotlib
 altair==4.2.2
 gunicorn
+flask
