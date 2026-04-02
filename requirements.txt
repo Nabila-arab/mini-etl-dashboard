@@ -1,5 +1,4 @@
 pandas==2.1.4
-
 duckdb
 streamlit==1.19.0
 matplotlib
