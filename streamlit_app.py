@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
-
 import matplotlib.pyplot as plt
 import io
 
-# Forcer pandas à n'utiliser QUE des types classiques (jamais Arrow/LargeUtf8)
-pd.options.mode.dtype_backend = "numpy_nullable"
 
 st.set_page_config(page_title="Mini-ETL Dashboard", layout="wide")
 
