@@ -3,14 +3,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import io
 
+# Forcer pandas à n'utiliser QUE des types classiques (jamais Arrow/LargeUtf8)
+pd.options.mode.dtype_backend = "numpy_nullable"
+
 st.set_page_config(page_title="Mini-ETL Dashboard", layout="wide")
 
 # ---- Chargement des données ----
 uploaded_file = st.sidebar.file_uploader("🗂️ Importer un fichier CSV (optionnel)", type=["csv"])
 
+def force_object(df):
+    """Convertit toutes les colonnes en type object pour éliminer tout LargeUtf8 résiduel."""
+    return df.astype(str).astype(object)
+
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    # Remarque : si tu veux pouvoir calculer les mêmes stats/graphes, adapte ici selon tes besoins
+    # Crée des DataFrames vides compatibles pour la démo CSV utilisateur
     prix_par_produit = pd.DataFrame(columns=["name", "price_usd"])
     prix_par_categorie = pd.DataFrame(columns=["category", "price_usd"])
     kpi = pd.DataFrame()
@@ -23,6 +30,12 @@ else:
     except Exception as e:
         st.error("Erreur lors du chargement des fichiers. Lance d'abord le pipeline ETL !")
         st.stop()
+
+# Forçage du type object (anti-LargeUtf8) pour tous les DataFrames dès la lecture
+df = force_object(df)
+prix_par_produit = force_object(prix_par_produit)
+prix_par_categorie = force_object(prix_par_categorie)
+kpi = force_object(kpi)
 
 # ===== MENU "À PROPOS DU PROJET" EN HAUT DE LA PAGE =====
 with st.expander("ℹ️ À propos du projet", expanded=False):
@@ -67,9 +80,12 @@ if len(categories) == 0:
 else:
     df_filtré = df_filtré[df_filtré["category"].isin(categories)]
 
+# Forcer ici aussi le type object
+df_filtré = force_object(df_filtré)
+
 if not df_filtré.empty and df_filtré["price_usd"].dropna().size > 0:
-    min_price_val = df_filtré["price_usd"].min()
-    max_price_val = df_filtré["price_usd"].max()
+    min_price_val = pd.to_numeric(df_filtré["price_usd"], errors="coerce").min()
+    max_price_val = pd.to_numeric(df_filtré["price_usd"], errors="coerce").max()
     min_price = int(min_price_val) if not pd.isna(min_price_val) else 0
     max_price = int(max_price_val) if not pd.isna(max_price_val) else 1
 else:
@@ -82,7 +98,7 @@ seuil = st.sidebar.slider(
     max_value=max_price if max_price > min_price else min_price + 1,
     value=min(500, max_price if max_price > min_price else min_price + 1)
 )
-df_cher = df_filtré[df_filtré["price_usd"] > seuil]
+df_cher = df_filtré[pd.to_numeric(df_filtré["price_usd"], errors="coerce") > seuil]
 
 # ---- Boutons d'export ----
 csv_filtre = df_filtré.to_csv(index=False).encode()
@@ -127,11 +143,16 @@ st.sidebar.markdown("**Projet – Nabila ARAB | MSc Data – 2026**")
 
 if not uploaded_file:
     col1, col2, col3 = st.columns(3)
-    col1.metric("💰 Prix total", f"{df['price_usd'].sum():,.2f} $")
-    col2.metric("📦 Nombre de produits", int(df['product_id'].nunique()))
-    col3.metric("📈 Marge totale", f"{df['margin_usd'].sum():,.2f} $")
+    # Utilise pd.to_numeric pour les colonnes numériques, sécurité supplémentaire
+    prix_total = pd.to_numeric(df['price_usd'], errors="coerce").sum()
+    nb_produits = df['product_id'].nunique()
+    marge_total = pd.to_numeric(df['margin_usd'], errors="coerce").sum()
+    col1.metric("💰 Prix total", f"{prix_total:,.2f} $")
+    col2.metric("📦 Nombre de produits", int(nb_produits))
+    col3.metric("📈 Marge totale", f"{marge_total:,.2f} $")
 
     if not prix_par_produit.empty:
+        prix_par_produit['price_usd'] = pd.to_numeric(prix_par_produit['price_usd'], errors="coerce")
         top_prod = prix_par_produit.sort_values("price_usd", ascending=False).iloc[0]
         st.info(f"**Top produit (CA)** : {top_prod['name']} ({top_prod['price_usd']}$)")
 
@@ -141,17 +162,20 @@ else:
 
 # ---- Tableau stylé des produits filtrés ----
 st.header("📝 Tableau des produits (filtres)")
-st.dataframe(df_filtré.astype(str), use_container_width=True)
+st.dataframe(force_object(df_filtré), use_container_width=True)
 
 # ---- Produits chers (si les colonnes sont présentes) ----
 if "price_usd" in df_filtré.columns and "category" in df_filtré.columns:
     st.header(f"🔥 Produits dont le prix > {seuil} $")
     if not df_cher.empty:
-        st.dataframe(df_cher.astype(str))
+        st.dataframe(force_object(df_cher))
     else:
         st.warning("Aucun produit ne correspond à ce filtre dans la sélection courante.")
+
 # ---- Graphiques principaux ----
 if not uploaded_file and not prix_par_produit.empty and not prix_par_categorie.empty:
+    prix_par_produit['price_usd'] = pd.to_numeric(prix_par_produit['price_usd'], errors="coerce")
+    prix_par_categorie['price_usd'] = pd.to_numeric(prix_par_categorie['price_usd'], errors="coerce")
     st.header("🏆 Produits stars par chiffre d'affaires")
     n = st.slider("Nombre de TOP produits à afficher", min_value=3, max_value=20, value=10)
     topN = prix_par_produit.sort_values("price_usd", ascending=False).head(n)
@@ -184,8 +208,8 @@ if not uploaded_file and not prix_par_produit.empty and not prix_par_categorie.e
 
     # Analyse automatique
     st.markdown("### 🤖 Analyse automatique :")
-    prix_moyen = df["price_usd"].mean()
-    marge_moyenne = df["margin_usd"].mean()
+    prix_moyen = pd.to_numeric(df["price_usd"], errors="coerce").mean()
+    marge_moyenne = pd.to_numeric(df["margin_usd"], errors="coerce").mean()
     if prix_moyen > 500:
         st.info(f"Le prix moyen des produits est élevé ({prix_moyen:.2f} $).")
     else:
@@ -196,9 +220,9 @@ if not uploaded_file and not prix_par_produit.empty and not prix_par_categorie.e
     else:
         st.success(f"La marge moyenne est correcte ({marge_moyenne:.2f} $).")
 
-    nb_outliers = df[df["price_usd"] > df["price_usd"].quantile(0.95)].shape[0]
+    nb_outliers = df[pd.to_numeric(df["price_usd"], errors="coerce") > pd.to_numeric(df["price_usd"], errors="coerce").quantile(0.95)].shape[0]
     if nb_outliers > 0:
-        st.info(f"💡 {nb_outliers} produit(s) ont un prix exceptionnellement élevé (top 5 % du dataset).")
+        st.info(f"���� {nb_outliers} produit(s) ont un prix exceptionnellement élevé (top 5 % du dataset).")
 
 st.markdown("---")
 st.markdown(
