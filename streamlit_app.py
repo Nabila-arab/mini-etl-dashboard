@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-if hasattr(pd.options.mode, "dtype_backend"):
-    pd.options.mode.dtype_backend = "numpy_nullable"
+
 import matplotlib.pyplot as plt
 import io
 
