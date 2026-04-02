@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 if hasattr(pd.options.mode, "dtype_backend"):
-    pd.options.mode.dtype_backend = "numpy_nullable"import matplotlib.pyplot as plt
+    pd.options.mode.dtype_backend = "numpy_nullable"
+import matplotlib.pyplot as plt
 import io
 
 # Forcer pandas à n'utiliser QUE des types classiques (jamais Arrow/LargeUtf8)
