@@ -1,123 +1,160 @@
-# 🛠️ Mini-ETL Produits : Pipeline de Traitement Automatisé et Dashboard Interactif
+# 🛠️ Mini-ETL Produits — Pipeline Automatisé & Dashboard Interactif
 
-**Auteur : Nabila ARAB – Master 1 Informatique Big Data – Paris 8**  
-Date : Mars 2026
+**Auteur : Nabila ARAB — Master 1 Informatique Big Data — Paris 8**  
+Date : Avril 2026
 
 ---
 
-## 🚀 Présentation du projet
+## 🚀 Présentation
 
-Ce projet propose un pipeline ETL automatisé pour le traitement de fichiers produits, ainsi qu’un dashboard **interactif** pour explorer, analyser et exporter ces données facilement, sans compétences techniques requises.
-
-### **Objectifs :**
-- Automatiser la préparation, le nettoyage, l’agrégation et l’analyse de données produits.
-- Fournir une interface **Streamlit** simple d’utilisation pour le filtrage, la visualisation et l’export des résultats.
-- Faciliter la prise de décision métier sur les données produits (ex : identification best-sellers, zones de risque...)
+Ce projet met à disposition une solution tout-en-un pour :
+- Nettoyer, agréger et analyser des données produits automatiquement (via scripts Python ETL)
+- Visualiser/interroger/explorer ces données dans un dashboard web interactif (Streamlit)
+- Exposer les résultats via une API simple (Flask)
+- Proposer un déploiement cloud sans installation complexe (Railway)
 
 ---
 
 ## 🏗️ Structure du projet
 
-| Dossier/Fichier           | Rôle                                                                |
-|---------------------------|---------------------------------------------------------------------|
-| `etl/`                    | Scripts de traitement ETL (run.py)                                  |
-| `data/`                   | Donn��es brutes à traiter (ex: products.csv)                         |
-| `exports/`                | Résultats produits par le pipeline ETL (clean_data.csv, prix, kpis…) |
-| `dashboard.py`            | Script principal du dashboard Streamlit                             |
-| `requirements.txt`        | Dépendances Python à installer                                      |
-| `README.md`               | Documentation du projet…                                            |
+```
+.
+├── api/               # API Flask
+│   └── app.py
+├── data/              # Jeux de données bruts à traiter
+│   └── products.csv
+├── duckdb/            # Base DuckDB persistée
+│   └── pipeline.duckdb
+├── etl/               # Scripts ETL (préparation et agrégation)
+│   └── run.py
+├── exports/           # Résultats produits par le pipeline ETL
+│   ├── clean_data.csv
+│   ├── prix_par_categorie.csv
+│   ├── prix_par_produit.csv
+│   ├── indicateurs.csv
+│   └── produits_chers.csv
+├── streamlit_app.py   # Dashboard Streamlit (interface principale)
+├── requirements.txt   # Dépendances Python
+├── Procfile           # (si déploiement cloud/Railway)
+├── README.md
+```
 
 ---
 
-## 🛠️ Technologies et librairies utilisées
+## ⚡️ Installation & prise en main rapide
 
-- **Python 3.8+**
-- **Pandas**, **DuckDB** : traitement de données
-- **Streamlit** : dashboard interactif (web)
-- **Matplotlib** : graphiques et visualisations
-- **Pdfkit**/**wkhtmltopdf** : génération d’exports PDF
-- **Jupyter Notebook** : exploration initiale & validation
+### 1. **Cloner le projet**
+```bash
+git clone https://github.com/Nabila-arab/mini-etl-dashboard.git
+cd mini-etl-dashboard
+```
 
----
+### 2. **Créer et activer un environnement virtuel**
+```bash
+python -m venv .venv
+# Sous Windows :
+.venv\Scripts\activate
+# Sous Mac/Linux :
+source .venv/bin/activate
+```
 
-## ⚡️ Installation et démarrage
+### 3. **Installer les dépendances**
+```bash
+pip install -r requirements.txt
+```
 
-1. **Cloner le projet** :
-    ```bash
-    git clone https://github.com/Nabila-arab/mini-etl-dashboard.git
-    cd mini-etl-dashboard
-    ```
+### 4. **Lancer le pipeline ETL**
+(Traite le CSV de `data/`, génère les fichiers nettoyés dans `exports/`, met à jour la base DuckDB)
+```bash
+python etl/run.py
+```
 
-2. **Créer et activer un environnement virtuel** :
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate    # Sur Mac/Linux
-    .venv\Scripts\activate       # Sur Windows
-    ```
+Les fichiers résultats (`clean_data.csv`, `prix_par_produit.csv`, etc.) sont créés/écrasés dans `exports/`.
 
-3. **Installer les dépendances** :
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. **Lancer le pipeline ETL** (à adapter selon ton script !):
-    ```bash
-    python etl/run.py
-    ```
-    ➔ Les fichiers propres sont alors générés dans le dossier `exports/`.
-
-5. **Lancer le dashboard** :
-    ```bash
-    streamlit run dashboard.py
-    ```
-    ➔ L’interface s’ouvre dans votre navigateur.
+### 5. **Lancer le dashboard interactif**
+```bash
+streamlit run streamlit_app.py
+```
+Ouvre automatiquement le dashboard dans le navigateur (interface web).
 
 ---
 
-## 🖥️ Fonctionnalités du dashboard
+## 🖥️ Fonctionnement du dashboard
 
-- **Recherche et filtrage dynamiques** : par nom, catégorie, intervalle de prix, etc.
-- **Visualisation des indicateurs clés** : prix total, marge, top produits, etc.
-- **Graphiques interactifs** : bar chart, pie chart, etc.
-- **Export des résultats** : CSV, Excel, PDF personnalisés
-- **Alertes et analyses intelligentes** : détection automatiques de cas métier (catégorie dominante, marges faibles, etc.)
-- **Téléchargement rapide de tous les résultats, y compris les rapports PDF/Excel**
-
----
-
-## 📑 Exemple de workflow type
-
-1. **Lancer le pipeline ETL pour traiter les nouveaux fichiers**
-2. **Démarrer le dashboard**
-3. **Appliquer les filtres voulus dans la sidebar**
-4. **Analyser les KPIs, tableaux et graphiques**
-5. **Exporter les résultats en un clic au format souhaité**
+- Recherchez/filtrez/visualisez vos produits (par nom, catégorie, prix, etc.).
+- Consultez les indicateurs clés (total CA, marge, nombre de produits...).
+- Affichez graphiques dynamiques (tops produits, répartition catégorie...).
+- Exportez à tout moment les données filtrées (CSV ou Excel).
+- Téléchargez rapidement les résultats (produits chers, etc.).
+- Si besoin, vous pouvez **importer un autre CSV** depuis la barre latérale.
 
 ---
 
-## 📝 Astuces et conseils d’utilisation
+## 🌐 Tester en ligne (Railway / déploiement cloud)
 
-- Si le dashboard affiche une erreur “Fichier non trouvé”, pensez à relancer le pipeline ETL (étape 4).
-- Le bouton “Télécharger PDF” nécessite que `wkhtmltopdf` soit installé sur votre PC.
-- Le projet peut facilement être adapté à d’autres jeux de données (ventes, stocks…), ou déployé sur le cloud (Streamlit Cloud, Heroku, etc.)
 
----
+Accédez directement à la version cloud ici :  
+👉 https://mini-etl-dashboard-production-e19a.up.railway.app/  
+Ou scannez le QR Code 
 
-## 🧑‍💻 Auteur / Contact
-
-- **Nabila ARAB**
-- Email : _[Ajoute ton email étudiant si tu veux]_
-- Université Paris 8 – Master Informatique Big Data
+_Note : pour tester en local, suivez simplement les étapes ci-dessus._
 
 ---
 
-## 🏆 Bonus
+## 🏷️ API (endpoints principaux)
 
-Scannez le QR code ci-dessous ou cliquez ici pour explorer le code source !  
-[https://github.com/Nabila-arab/mini-etl-dashboard](https://github.com/Nabila-arab/mini-etl-dashboard)
+- `GET /indicateurs` : KPIs globaux du catalogue  
+- `GET /clean_data`   : Jeu de données nettoyé
+- `GET /prix_par_produit` : Agrégation CA par produit
+- `GET /produits_chers?seuil=500` : Filtre produits chers (> 500€ par défaut)  
+
+Pour démarrer l’API seul :
+```bash
+python api/app.py
+```
+Modifier l’URL si besoin dans votre code.
+
+---
+
+## 📦 Exemples fournis
+
+- **Jeu de test** (`data/products.csv`) : catalogue produit fictif
+- **Notebooks d’analyse** : visualisation des résultats générés (facultatif)
+
+---
+
+## ❓ Problèmes fréquents / FAQ
+
+- **Erreur “Fichier non trouvé” sur le dashboard** :  
+  → Relancez le pipeline ETL (`python etl/run.py`) pour regénérer les exports.
+
+- **Problème de dépendance (duckdb, pyarrow, etc.)** :  
+  → Vérifiez que l’environnement virtuel est bien activé avant l’installation.
+
+- **Port déjà utilisé avec Streamlit** :  
+  → Fermez l’instance précédente ou changez le port (`streamlit run streamlit_app.py --server.port 8502`).
+
+---
+
+## ✉️ Contact
+
+- Auteur : Nabila ARAB
 
 ---
 
 ## 📜 Licence
 
-Projet académique – Usage non commercial
+Projet académique — Usage pédagogique
+
+---
+
+## 💡 Améliorations possibles (prochaines versions)
+
+- API multi-user et authentification
+- Imports multi-formats (Excel, API, SQL…)
+- Dashboard collaboratif / exports PDF automatiques
+- Intégration prédiction (Machine Learning) / analyse intelligente
+
+---
+
+\_Dernière mise à jour : avril 2026\_

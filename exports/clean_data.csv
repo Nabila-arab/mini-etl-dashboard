@@ -1196,3 +1196,4 @@ product_id,category,name,price_usd,cost_usd,margin_usd
 1195,Toys,Board Game Darkkhaki 216,6.51,3.4,3.11
 1196,Toys,Building Blocks Lightcoral 517,21.83,13.44,8.39
 1197,Toys,Building Blocks Whitesmoke 876,48.51,27.32,21.19
+1196,Toys,Building Blocks Lightcoral 517,21.83,-10.0,31.83
